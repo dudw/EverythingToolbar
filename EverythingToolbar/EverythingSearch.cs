@@ -105,7 +105,7 @@ namespace EverythingToolbar
         {
             get
             {
-                return _currentFilter ?? FilterLoader.Instance.DefaultFilters[0];
+                return _currentFilter ?? FilterLoader.Instance.GetLastFilter();
             }
             set
             {
@@ -220,7 +220,13 @@ namespace EverythingToolbar
                     flags |= EVERYTHING_REQUEST_HIGHLIGHTED_PATH;
                     bool regEx = CurrentFilter.IsRegExEnabled ?? Properties.Settings.Default.isRegExEnabled;
 
-                    Everything_SetSearchW(CurrentFilter.Search + (CurrentFilter.Search.Length > 0 && !regEx ? " " : "") + SearchTerm);
+                    string search = CurrentFilter.Search + (CurrentFilter.Search.Length > 0 && !regEx ? " " : "") + SearchTerm;
+                    foreach (Filter filter in FilterLoader.Instance.DefaultUserFilters)
+                    {
+                        search = search.Replace(filter.Macro + ":", filter.Search + " ");
+                    }
+
+                    Everything_SetSearchW(search);
                     Everything_SetRequestFlags(flags);
                     Everything_SetSort((uint)Properties.Settings.Default.sortBy);
                     Everything_SetMatchCase(CurrentFilter.IsMatchCase ?? Properties.Settings.Default.isMatchCase);
@@ -268,7 +274,16 @@ namespace EverythingToolbar
         public void Reset()
         {
             SearchTerm = null;
-            CurrentFilter = FilterLoader.Instance.DefaultFilters[0];
+
+            if (Properties.Settings.Default.isRememberFilter)
+            {
+                Properties.Settings.Default.lastFilter = CurrentFilter.Name;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                CurrentFilter = FilterLoader.Instance.DefaultFilters[0];
+            }
         }
 
         public void CycleFilters(int offset = 1)

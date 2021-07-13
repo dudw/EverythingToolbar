@@ -109,7 +109,7 @@ namespace EverythingToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Medium")]
+        [global::System.Configuration.DefaultSettingValueAttribute("MEDIUM")]
         public string theme {
             get {
                 return ((string)(this["theme"]));
@@ -121,7 +121,7 @@ namespace EverythingToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
+        [global::System.Configuration.DefaultSettingValueAttribute("NORMAL")]
         public string itemTemplate {
             get {
                 return ((string)(this["itemTemplate"]));
@@ -248,6 +248,66 @@ namespace EverythingToolbar.Properties {
             }
             set {
                 this["isShowQuickToggles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isEnableHistory {
+            get {
+                return ((bool)(this["isEnableHistory"]));
+            }
+            set {
+                this["isEnableHistory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool isUpgradeRequired {
+            get {
+                return ((bool)(this["isUpgradeRequired"]));
+            }
+            set {
+                this["isUpgradeRequired"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isReplaceStartMenuSearch {
+            get {
+                return ((bool)(this["isReplaceStartMenuSearch"]));
+            }
+            set {
+                this["isReplaceStartMenuSearch"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isRememberFilter {
+            get {
+                return ((bool)(this["isRememberFilter"]));
+            }
+            set {
+                this["isRememberFilter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastFilter {
+            get {
+                return ((string)(this["lastFilter"]));
+            }
+            set {
+                this["lastFilter"] = value;
             }
         }
     }

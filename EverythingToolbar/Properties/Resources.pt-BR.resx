@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -179,6 +179,18 @@
   </data>
   <data name="DefaultFilterFolder" xml:space="preserve">
     <value>Pasta</value>
+  </data>
+  <data name="ItemTemplateCompact" xml:space="preserve">
+    <value>Compacto</value>
+  </data>
+  <data name="ItemTemplateCompactDetailed" xml:space="preserve">
+    <value>Compacto (com detalhes)</value>
+  </data>
+  <data name="ItemTemplateNormal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="ItemTemplateNormalDetailed" xml:space="preserve">
+    <value>Normal (com detalhes)</value>
   </data>
   <data name="KeyAlt" xml:space="preserve">
     <value>Alt</value>
@@ -288,6 +300,9 @@
   <data name="SettingsDisableAnimations" xml:space="preserve">
     <value>Desabilitar animações</value>
   </data>
+  <data name="SettingsEnableHistory" xml:space="preserve">
+    <value>Enable search history</value>
+  </data>
   <data name="SettingsHideEmptyResults" xml:space="preserve">
     <value>Ocultar buscas sem resultados</value>
   </data>
@@ -306,8 +321,20 @@
   <data name="SettingsRegularExpressions" xml:space="preserve">
     <value>Expressões Regulares</value>
   </data>
+  <data name="SettingsRememberFilter" xml:space="preserve">
+    <value>Remember filter</value>
+  </data>
+  <data name="SettingsReplaceStartMenuSearch" xml:space="preserve">
+    <value>Replace start menu search (experimental)</value>
+  </data>
   <data name="SettingsRules" xml:space="preserve">
     <value>Regras...</value>
+  </data>
+  <data name="SettingsShowQuickToggles" xml:space="preserve">
+    <value>Show quick toggles</value>
+  </data>
+  <data name="SettingsShowResultsCount" xml:space="preserve">
+    <value>Show results count</value>
   </data>
   <data name="SettingsSortBy" xml:space="preserve">
     <value>Ordenar por</value>
@@ -404,6 +431,15 @@
   </data>
   <data name="SortByTypeNameDescending" xml:space="preserve">
     <value>Tipo em ordem decrescente</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Escuro</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="ThemeMedium" xml:space="preserve">
+    <value>Médio</value>
   </data>
   <data name="UserFilterAudio" xml:space="preserve">
     <value>Áudio</value>

@@ -1,5 +1,6 @@
 ﻿using EverythingToolbar.Helpers;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,13 +59,21 @@ namespace EverythingToolbar
             ShortcutSelector shortcutSelector = new ShortcutSelector();
             if (shortcutSelector.ShowDialog().Value)
             {
+                if (shortcutSelector.Modifiers == ModifierKeys.Windows)
+                {
+                    ShortcutManager.Instance.SetShortcut(shortcutSelector.Key, shortcutSelector.Modifiers);
+                    foreach (Process exe in Process.GetProcesses())
+                    {
+                        if (exe.ProcessName == "explorer")
+                            exe.Kill();
+                    }
+                }
+
                 if (ShortcutManager.Instance.AddOrReplace("FocusSearchBox",
                     shortcutSelector.Key,
                     shortcutSelector.Modifiers))
                 {
-                    Properties.Settings.Default.shortcutKey = (int)shortcutSelector.Key;
-                    Properties.Settings.Default.shortcutModifiers = (int)shortcutSelector.Modifiers;
-                    Properties.Settings.Default.Save();
+                    ShortcutManager.Instance.SetShortcut(shortcutSelector.Key, shortcutSelector.Modifiers);
                 }
                 else
                 {
@@ -118,14 +127,14 @@ namespace EverythingToolbar
                 if (itemParent.Items[i] == itemChecked)
                 {
                     (itemParent.Items[i] as MenuItem).IsChecked = true;
-                    Properties.Settings.Default.theme = itemChecked.Header.ToString();
+                    Properties.Settings.Default.theme = itemChecked.Tag.ToString();
                     continue;
                 }
 
                 (itemParent.Items[i] as MenuItem).IsChecked = false;
             }
 
-            ApplicationResources.Instance.ApplyTheme(itemChecked.Header.ToString());
+            ApplicationResources.Instance.ApplyTheme(itemChecked.Tag.ToString());
         }
 
         private void OnItemTemplateClicked(object sender, RoutedEventArgs e)
@@ -138,14 +147,14 @@ namespace EverythingToolbar
                 if (itemParent.Items[i] == itemChecked)
                 {
                     (itemParent.Items[i] as MenuItem).IsChecked = true;
-                    Properties.Settings.Default.itemTemplate = itemChecked.Header.ToString();
+                    Properties.Settings.Default.itemTemplate = itemChecked.Tag.ToString();
                     continue;
                 }
 
                 (itemParent.Items[i] as MenuItem).IsChecked = false;
             }
 
-            ApplicationResources.Instance.ApplyItemTemplate(itemChecked.Header.ToString());
+            ApplicationResources.Instance.ApplyItemTemplate(itemChecked.Tag.ToString());
         }
 
         private void OnMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
