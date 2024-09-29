@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using EverythingToolbar.Properties;
 using NHotkey;
 using NHotkey.Wpf;
 using NLog;
@@ -29,7 +28,7 @@ namespace EverythingToolbar.Helpers
         public static readonly ShortcutManager Instance = new ShortcutManager();
 
         private static readonly ILogger _logger = ToolbarLogger.GetLogger<ShortcutManager>();
-        private WinEventDelegate winEventDelegate = null;
+        private WinEventDelegate winEventDelegate;
         private static readonly Dictionary<string, EventHandler<HotkeyEventArgs>> shortcuts = new Dictionary<string, EventHandler<HotkeyEventArgs>>();
         private static Action<object, HotkeyEventArgs> focusToolbarCallback;
         private static LowLevelKeyboardProc llKeyboardHookProc;
@@ -37,8 +36,8 @@ namespace EverythingToolbar.Helpers
         private static IntPtr winEventHookId = IntPtr.Zero;
         private static IntPtr searchAppHwnd = IntPtr.Zero;
         private static event EventHandler<WinKeyEventArgs> WinKeyEventHandler;
-        private static bool isException = false;
-        private static bool isNativeSearchActive = false;
+        private static bool isException;
+        private static bool isNativeSearchActive;
         private static string searchTermQueue = "";
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
@@ -46,14 +45,14 @@ namespace EverythingToolbar.Helpers
 
         private ShortcutManager()
         {
-            Settings.Default.PropertyChanged += OnSettingsChanged;
+            ToolbarSettings.User.PropertyChanged += OnSettingsChanged;
         }
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "isReplaceStartMenuSearch")
+            if (e.PropertyName == nameof(ToolbarSettings.User.IsReplaceStartMenuSearch))
             {
-                if (Settings.Default.isReplaceStartMenuSearch)
+                if (ToolbarSettings.User.IsReplaceStartMenuSearch)
                     HookStartMenu();
                 else
                     UnhookStartMenu();
@@ -82,8 +81,8 @@ namespace EverythingToolbar.Helpers
 
         public void SetShortcut(Key key, ModifierKeys mods)
         {
-            Settings.Default.shortcutKey = (int)key;
-            Settings.Default.shortcutModifiers = (int)mods;
+            ToolbarSettings.User.ShortcutKey = (int)key;
+            ToolbarSettings.User.ShortcutModifiers = (int)mods;
         }
 
         public void CaptureKeyboard(EventHandler<WinKeyEventArgs> callback)
@@ -104,8 +103,8 @@ namespace EverythingToolbar.Helpers
         {
             if (nCode >= 0)
             {
-                Keys vkCode = (Keys)Marshal.ReadInt32(lParam);
-                bool isDown = (int)wParam == WM_KEYDOWN || (int)wParam == WM_SYSKEYDOWN;
+                var vkCode = (Keys)Marshal.ReadInt32(lParam);
+                var isDown = (int)wParam == WM_KEYDOWN || (int)wParam == WM_SYSKEYDOWN;
                 switch (vkCode)
                 {
                     case Keys.Control:
@@ -145,7 +144,7 @@ namespace EverythingToolbar.Helpers
 
         public void HookStartMenu()
         {
-            winEventDelegate = new WinEventDelegate(WinEventProc);
+            winEventDelegate = FocusedWindowChangedEvent;
             winEventHookId = SetWinEventHook(3, 3, IntPtr.Zero, winEventDelegate, 0, 0, 0);
         }
 
@@ -154,20 +153,15 @@ namespace EverythingToolbar.Helpers
             UnhookWinEvent(winEventHookId);
         }
 
-        private void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        private void FocusedWindowChangedEvent(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            IntPtr hWnd = GetForegroundWindow();
-            GetWindowThreadProcessId(hWnd, out uint lpdwProcessId);
-            IntPtr hProcess = OpenProcess(0x0410, false, lpdwProcessId);
-            StringBuilder text = new StringBuilder(1000);
-            GetModuleFileNameEx(hProcess, IntPtr.Zero, text, text.Capacity);
-            CloseHandle(hProcess);
+            GetForegroundWindowAndProcess(out IntPtr foregroundHwnd, out String foregroundProcessName);
 
-            if (text.ToString().EndsWith("SearchApp.exe") ||
-                text.ToString().EndsWith("SearchUI.exe") ||
-                text.ToString().EndsWith("SearchHost.exe"))
+            if (foregroundProcessName.EndsWith("SearchApp.exe") ||
+                foregroundProcessName.EndsWith("SearchUI.exe") ||
+                foregroundProcessName.EndsWith("SearchHost.exe"))
             {
-                searchAppHwnd = hWnd;
+                searchAppHwnd = foregroundHwnd;
                 searchTermQueue = "";
                 HookStartMenuInput();
             }
@@ -187,12 +181,24 @@ namespace EverythingToolbar.Helpers
             }
         }
 
+        private static void GetForegroundWindowAndProcess(out IntPtr foregroundHwnd, out String foregroundProcessName)
+        {
+            foregroundHwnd = GetForegroundWindow();
+            GetWindowThreadProcessId(foregroundHwnd, out var lpdwProcessId);
+            var foregroundProcess = OpenProcess(0x0410, false, lpdwProcessId);
+            var processNameBuilder = new StringBuilder(1000);
+            GetModuleFileNameEx(foregroundProcess, IntPtr.Zero, processNameBuilder, processNameBuilder.Capacity);
+            CloseHandle(foregroundProcess);
+            foregroundProcessName = processNameBuilder.ToString();
+
+        }
+
         public static IntPtr StartMenuKeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0 && !isNativeSearchActive)
             {
-                uint virtualKeyCode = (uint)Marshal.ReadInt32(lParam);
-                bool isKeyDown = wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN;
+                var virtualKeyCode = (uint)Marshal.ReadInt32(lParam);
+                var isKeyDown = wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN;
 
                 if(Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin))
                 {
@@ -206,13 +212,13 @@ namespace EverythingToolbar.Helpers
                 }
 
                 // Determine key string
-                byte[] keyboardState = new byte[255];
-                string keyString = "";
+                var keyboardState = new byte[255];
+                var keyString = "";
                 if (GetKeyboardState(keyboardState))
                 {
-                    uint scanCode = MapVirtualKey(virtualKeyCode, 0);
-                    IntPtr inputLocaleIdentifier = GetKeyboardLayout(0);
-                    StringBuilder keyStringbuilder = new StringBuilder();
+                    var scanCode = MapVirtualKey(virtualKeyCode, 0);
+                    var inputLocaleIdentifier = GetKeyboardLayout(0);
+                    var keyStringbuilder = new StringBuilder();
                     ToUnicodeEx(virtualKeyCode, scanCode, keyboardState, keyStringbuilder, 5, 0, inputLocaleIdentifier);
                     keyString = keyStringbuilder.ToString();
                     if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
@@ -231,12 +237,10 @@ namespace EverythingToolbar.Helpers
                         return CallNextHookEx(llKeyboardHookId, nCode, wParam, lParam);
                     }
                     // Send input to EverythingToolbar
-                    else
-                    {
-                        searchTermQueue += keyString.ToString();
-                        CloseStartMenu();
-                        return (IntPtr)1;
-                    }
+
+                    searchTermQueue += keyString;
+                    CloseStartMenu();
+                    return (IntPtr)1;
                 }
             }
 
@@ -245,7 +249,7 @@ namespace EverythingToolbar.Helpers
         
         public static void CloseStartMenu()
         {
-            if (searchAppHwnd != null)
+            if (searchAppHwnd != IntPtr.Zero)
             {
                 PostMessage(searchAppHwnd, 0x0010, 0, 0);
             }
@@ -255,7 +259,7 @@ namespace EverythingToolbar.Helpers
         {
             UnhookWindowsHookEx(llKeyboardHookId);
             llKeyboardHookProc = StartMenuKeyboardHookCallback;
-            llKeyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, llKeyboardHookProc, (IntPtr)0, 0);
+            llKeyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, llKeyboardHookProc, IntPtr.Zero, 0);
         }
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);

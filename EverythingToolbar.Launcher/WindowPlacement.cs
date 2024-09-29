@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using EverythingToolbar.Helpers;
-using EverythingToolbar.Properties;
 using Microsoft.Xaml.Behaviors;
 using Size = System.Windows.Size;
 
@@ -87,7 +84,7 @@ namespace EverythingToolbar.Launcher
 
         private Size GetTargetWindowSize(double scalingFactor)
         {
-            var windowSize = Settings.Default.popupSize;
+            var windowSize = new Size(ToolbarSettings.User.PopupWidth, ToolbarSettings.User.PopupHeight);
             windowSize.Width = Math.Max(windowSize.Width, AssociatedObject.MinWidth) / scalingFactor;
             windowSize.Height = Math.Max(windowSize.Height, AssociatedObject.MinHeight) / scalingFactor;
             return windowSize;

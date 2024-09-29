@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using EverythingToolbar.Data;
 using EverythingToolbar.Helpers;
-using EverythingToolbar.Properties;
 
 namespace EverythingToolbar
 {
@@ -25,7 +23,7 @@ namespace EverythingToolbar
 
             _rules = LoadRules();
             dataGrid.ItemsSource = _rules;
-            autoApplyRulesCheckbox.IsChecked = Settings.Default.isAutoApplyRules;
+            autoApplyRulesCheckbox.IsChecked = ToolbarSettings.User.IsAutoApplyRules;
             UpdateUI();
         }
 
@@ -38,7 +36,7 @@ namespace EverythingToolbar
         {
             if(SaveRules(_rules, (bool)autoApplyRulesCheckbox.IsChecked))
             {
-                Settings.Default.isAutoApplyRules = (bool)autoApplyRulesCheckbox.IsChecked;
+                ToolbarSettings.User.IsAutoApplyRules = (bool)autoApplyRulesCheckbox.IsChecked;
                 Close();
             }
         }
@@ -88,14 +86,14 @@ namespace EverythingToolbar
 
         private void AddItem(object sender, RoutedEventArgs e)
         {
-            _rules.Insert(_rules.Count, new Rule() { Name = "", Type = FileType.Any, Expression = "", Command = "" });
+            _rules.Insert(_rules.Count, new Rule { Name = "", Type = FileType.Any, Expression = "", Command = "" });
             RefreshList();
             dataGrid.SelectedIndex = _rules.Count - 1;
         }
 
         private void DeleteSelected(object sender, RoutedEventArgs e)
         {
-            int selectedIndex = dataGrid.SelectedIndex;
+            var selectedIndex = dataGrid.SelectedIndex;
             _rules.RemoveAt(selectedIndex);
             RefreshList();
             if (_rules.Count > selectedIndex)
@@ -120,8 +118,8 @@ namespace EverythingToolbar
 
         private void MoveItem(int delta)
         {
-            int selectedIndex = dataGrid.SelectedIndex;
-            Rule item = dataGrid.SelectedItem as Rule;
+            var selectedIndex = dataGrid.SelectedIndex;
+            var item = dataGrid.SelectedItem as Rule;
             _rules.RemoveAt(selectedIndex);
             _rules.Insert(selectedIndex + delta, item);
             RefreshList();
@@ -167,12 +165,12 @@ namespace EverythingToolbar
             if (searchResult == null)
                 return false;
 
-            if (Settings.Default.isAutoApplyRules && string.IsNullOrEmpty(command))
+            if (ToolbarSettings.User.IsAutoApplyRules && string.IsNullOrEmpty(command))
             {
-                foreach (Rule r in LoadRules())
+                foreach (var r in LoadRules())
                 {
-                    bool regexCond = !string.IsNullOrEmpty(r.Expression) && Regex.IsMatch(searchResult.FullPathAndFileName, r.Expression);
-                    bool typeCond = searchResult.IsFile && r.Type != FileType.Folder || !searchResult.IsFile && r.Type != FileType.File;
+                    var regexCond = !string.IsNullOrEmpty(r.Expression) && Regex.IsMatch(searchResult.FullPathAndFileName, r.Expression);
+                    var typeCond = searchResult.IsFile && r.Type != FileType.Folder || !searchResult.IsFile && r.Type != FileType.File;
                     if (regexCond && typeCond)
                     {
                         command = r.Command;
